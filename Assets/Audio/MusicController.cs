@@ -21,7 +21,8 @@ public class MusicController : MonoBehaviour
     private void Start()
     {
         StartMusic();
-        PauseStateController.Instance.PauseAction.performed += context => FadeAudio(PauseStateController.Instance.Paused);
+        PauseStateController.Instance.OnPause += () => FadeAudio(true);
+        PauseStateController.Instance.OnUnpause += () => FadeAudio(false);
     }
 
     private void Update()
