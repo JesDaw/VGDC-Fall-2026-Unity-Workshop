@@ -7,8 +7,9 @@ public class PauseStateController : MonoBehaviour
     public static PauseStateController Instance { get; private set; }
     [SerializeField] private GameObject pauseUI;
     [SerializeField] private InputActionMap uiMap;
-    public InputAction PauseAction { get; private set; }
+    private InputAction _pauseAction;
     public bool Paused { get; private set; }
+    public Action OnPause, OnUnpause;
     
     private void Awake()
     {
@@ -16,8 +17,10 @@ public class PauseStateController : MonoBehaviour
         {
             Instance = this;
             uiMap.Enable();
-            PauseAction = uiMap.FindAction("Pause");
-            PauseAction.performed += context => HandlePauseInput();
+            _pauseAction = uiMap.FindAction("Pause");
+            _pauseAction.performed += context => HandlePauseInput();
+            OnPause += () => pauseUI.SetActive(true);
+            OnUnpause += () => pauseUI.SetActive(false);
         }
         else
         {
@@ -32,25 +35,27 @@ public class PauseStateController : MonoBehaviour
 
     private void HandlePauseInput()
     {
-        Debug.Log("HandlePauseInput called");
+        // Debug.Log("HandlePauseInput called");
         if (Paused)
         {
-            OnUnpause();
+            HandleUnpause();
         }
         else
         {
-            OnPause();
+            HandlePause();
         }
         Paused = !Paused;
     }
 
-    private void OnPause()
+    private void HandlePause()
     {
-        pauseUI.SetActive(true);
+        OnPause?.Invoke();
+        Time.timeScale = 0;
     }
 
-    private void OnUnpause()
+    private void HandleUnpause()
     {
-        pauseUI.SetActive(false);
+        OnUnpause?.Invoke();
+        Time.timeScale = 1;
     }
 }
